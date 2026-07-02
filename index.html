@@ -39,22 +39,20 @@
 
 
     <script>
-    function logar(){
+function logar(){
     var login = document.getElementById('login').value.trim();
     var senha = document.getElementById('senha').value;
 
     if(login == "admin" && senha == "1234"){
-        // Abre o admin na mesma tela
         location.href = "admin.html";
         return; 
     }
 
     let userRegister = JSON.parse(localStorage.getItem("userRegister")) || {};
     
-    if (userRegister[login] !== undefined) {
-        if (userRegister[login] === senha){
+    if (userRegister[login] != undefined) {
+        if (userRegister[login] == senha){
             sessionStorage.setItem("userLogin", login);
-            
             location.href = "roleta.html";
         } else {
             alert('Usuário ou senha inválidos!');
@@ -64,7 +62,6 @@
         localStorage.setItem("userRegister", JSON.stringify(userRegister));
 
         sessionStorage.setItem("userLogin", login);
-        
         location.href = "roleta.html";
     }
 }

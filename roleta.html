@@ -19,85 +19,78 @@
     </div>
 
     <script>
-        // FIX: Gets the unique name assigned strictly to THIS tab session
-        var usuarioLogado = sessionStorage.getItem("userLogin") || "Participante";
-        document.getElementById("boasVindas").innerText = usuarioLogado;
+    var usuarioLogado = sessionStorage.getItem("userLogin") || "Participante";
+    document.getElementById("boasVindas").innerText = usuarioLogado;
 
-        function enviarSugestao() {
-            var campo = document.getElementById("campoLetra");
-            var botao = document.getElementById("btnEnviar");
-            var textoSugestao = campo.value.trim();
+    function enviarSugestao() {
+        var campo = document.getElementById("campoLetra");
+        var botao = document.getElementById("btnEnviar");
+        var textoSugestao = campo.value.trim();
 
-            if (textoSugestao === "") {
-                alert("Erro: Digite uma sugestão válida antes de enviar!");
+        if (textoSugestao == "") {
+            alert("Erro: Digite uma sugestão válida antes de enviar!");
+            return;
+        }
+
+        var ideiaBrain = localStorage.getItem("sugestoesBrainstorm");
+        var listaIdeias = JSON.parse(ideiaBrain) || [];
+
+        for (var i = 0; i < listaIdeias.length; i++) {
+            if (listaIdeias[i].usuario == usuarioLogado) {
+                alert("Erro: Você já inseriu uma sugestão nesta rodada!");
                 return;
             }
-
-            // CHECK: Look if this specific user already has an item inside the shared pool
-            var dadosBrutos = localStorage.getItem("sugestoesBrainstorm");
-            var listaDados = JSON.parse(dadosBrutos) || [];
-            
-            for (var i = 0; i < listaDados.length; i++) {
-                if (listaDados[i].usuario === usuarioLogado) {
-                    alert("Erro: Você já inseriu uma sugestão nesta rodada!");
-                    return;
-                }
-            }
-
-            // Save to shared list
-            listaDados.push({
-                usuario: usuarioLogado,
-                texto: textoSugestao
-            });
-
-            localStorage.setItem("sugestoesBrainstorm", JSON.stringify(listaDados));
-            
-            // UI Visual Lock
-            campo.disabled = true;
-            botao.style.backgroundColor = "gray";
-            botao.innerText = "Enviado";
         }
 
-        function monitorarRodada() {
-            var resultadoSorteado = localStorage.getItem("resultadoRoleta");
-            var dadosBrutos = localStorage.getItem("sugestoesBrainstorm");
-            var listaDados = JSON.parse(dadosBrutos) || [];
-            
-            var statusTxt = document.getElementById("statusRodada");
-            var resultadoTxt = document.getElementById("caixaResultado");
-            var campo = document.getElementById("campoLetra");
-            var botao = document.getElementById("btnEnviar");
+        listaIdeias.push({
+            usuario: usuarioLogado,
+            texto: textoSugestao
+        });
 
-            // Look if I have an active post in the database right now
-            var euJaEnviei = false;
-            for (var i = 0; i < listaDados.length; i++) {
-                if (listaDados[i].usuario === usuarioLogado) {
-                    euJaEnviei = true;
-                }
-            }
+        localStorage.setItem("sugestoesBrainstorm", JSON.stringify(listaIdeias));
+        
+        campo.disabled = true;
+        botao.style.backgroundColor = "gray";
+        botao.innerText = "Enviado";
+    }
 
-            if (resultadoSorteado) {
-                statusTxt.innerText = "Sorteio Realizado!";
-                resultadoTxt.innerText = resultadoSorteado;
-            } else {
-                statusTxt.innerText = "Aguardando sorteio...";
-                resultadoTxt.innerText = "";
+    function monitorarRodada() {
+        var resultadoSorteado = localStorage.getItem("resultadoRoleta");
+        var ideiaBrain = localStorage.getItem("sugestoesBrainstorm");
+        var listaIdeias = JSON.parse(ideiaBrain) || [];
+        
+        var statusTxt = document.getElementById("statusRodada");
+        var resultadoTxt = document.getElementById("caixaResultado");
+        var campo = document.getElementById("campoLetra");
+        var botao = document.getElementById("btnEnviar");
 
-                // Reset Detection: If the admin wiped everything, unlock the user inputs
-                if (listaDados.length === 0) {
-                    campo.disabled = false;
-                    botao.style.backgroundColor = "green";
-                    botao.innerText = "Enviar";
-                } else if (euJaEnviei) {
-                    // Keeps it locked if the round is still active and they already sent a suggestion
-                    campo.disabled = true;
-                    botao.style.backgroundColor = "gray";
-                    botao.innerText = "Enviado";
-                }
+        var euJaEnviei = false;
+        for (var i = 0; i < listaIdeias.length; i++) {
+            if (listaIdeias[i].usuario == usuarioLogado) {
+                euJaEnviei = true;
             }
         }
 
-        setInterval(monitorarRodada, 1000);
-    </script>
+        if (resultadoSorteado) {
+            statusTxt.innerText = "Sorteio Realizado!";
+            resultadoTxt.innerText = resultadoSorteado;
+        } else {
+            statusTxt.innerText = "Aguardando sorteio...";
+            resultadoTxt.innerText = "";
+
+            if (!ideiaBrain || listaIdeias.length == 0) {
+                campo.disabled = false;
+                botao.style.backgroundColor = "green";
+                botao.innerText = "Enviar";
+            } else if (euJaEnviei == true) {
+                campo.disabled = true;
+                botao.style.backgroundColor = "gray";
+                botao.innerText = "Enviado";
+            }
+        }
+    }
+
+    setInterval(monitorarRodada, 1000);
+</script>
 </body>
 </html>

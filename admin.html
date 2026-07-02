@@ -31,68 +31,68 @@
     </div>
 
     <script>
-        var grausAtuais = 0;
-        localStorage.removeItem("resultadoRoleta");
+    var grausAtuais = 0;
+    localStorage.removeItem("resultadoRoleta");
 
-        function girarRoleta() {
-            var dadosBrutos = localStorage.getItem("sugestoesBrainstorm");
-            var listaDados = JSON.parse(dadosBrutos) || [];
+    function girarRoleta() {
+        var ideiaBrain = localStorage.getItem("sugestoesBrainstorm");
+        var listaIdeias = JSON.parse(ideiaBrain) || [];
 
-            if (listaDados.length === 0) {
-                alert("Erro: Não tem nenhuma opção inserida!");
-                return;
-            }
-
-            var roletaElemento = document.getElementById("roleta");
-            var textoResultado = document.getElementById("resultado");
-
-            textoResultado.innerText = "Girando...";
-
-            grausAtuais = grausAtuais + 1800 + Math.floor(Math.random() * 360);
-            roletaElemento.style.transform = "rotate(" + grausAtuais + "deg)";
-
-            var numeroSorteado = Math.floor(Math.random() * listaDados.length);
-            var sugestaoGanhadora = listaDados[numeroSorteado];
-            var resultadoFinal = "Ganhador: " + sugestaoGanhadora.texto;
-
-            setTimeout(function() {
-                textoResultado.innerText = resultadoFinal;
-                localStorage.setItem("resultadoRoleta", resultadoFinal);
-            }, 4000);
+        if (listaIdeias.length == 0) {
+            alert("Erro: Não tem nenhuma opção inserida!");
+            return;
         }
 
-        function carregarSugestoes() {
-            var listaUl = document.getElementById("listaSugestoes");
-            var dadosBrutos = localStorage.getItem("sugestoesBrainstorm");
-            var listaDados = JSON.parse(dadosBrutos) || [];
+        var roletaElemento = document.getElementById("roleta");
+        var textoResultado = document.getElementById("resultado");
 
-            listaUl.innerHTML = "";
+        textoResultado.innerText = "Girando...";
 
-            if (listaDados.length === 0) {
-                listaUl.innerHTML = "<li>Vazio...</li>";
-                return;
-            }
+        grausAtuais = grausAtuais + 1800 + Math.floor(Math.random() * 360);
+        roletaElemento.style.transform = "rotate(" + grausAtuais + "deg)";
 
-            for (var i = 0; i < listaDados.length; i++) {
-                var item = listaDados[i];
-                listaUl.innerHTML += "<li class='item-sugestao'><b>" + item.usuario + ":</b> " + item.texto + "</li>";
-            }
+        var numeroSorteado = Math.floor(Math.random() * listaIdeias.length);
+        var sugestaoGanhadora = listaIdeias[numeroSorteado];
+        var resultadoFinal = "Ganhador: " + sugestaoGanhadora.texto;
+
+        setTimeout(function() {
+            textoResultado.innerText = resultadoFinal;
+            localStorage.setItem("resultadoRoleta", resultadoFinal);
+        }, 4000);
+    }
+
+    function carregarSugestoes() {
+        var listaUl = document.getElementById("listaSugestoes");
+        var ideiaBrain = localStorage.getItem("sugestoesBrainstorm");
+        var listaIdeias = JSON.parse(ideiaBrain) || [];
+
+        listaUl.innerHTML = "";
+
+        if (listaIdeias.length == 0) {
+            listaUl.innerHTML = "<li>Vazio...</li>";
+            return;
         }
 
-        function limparSugestoes() {
-            localStorage.removeItem("sugestoesBrainstorm");
-            carregarSugestoes();
+        for (var i = 0; i < listaIdeias.length; i++) {
+            var item = listaIdeias[i];
+            listaUl.innerHTML += "<li class='item-sugestao'><b>" + item.usuario + ":</b> " + item.texto + "</li>";
         }
+    }
 
-        function novaRodada() {
-            document.getElementById("resultado").innerText = "";
-            localStorage.removeItem("resultadoRoleta");
-            localStorage.removeItem("sugestoesBrainstorm"); 
-            carregarSugestoes();
-        }
-
-        setInterval(carregarSugestoes, 1000);
+    function limparSugestoes() {
+        localStorage.removeItem("sugestoesBrainstorm");
         carregarSugestoes();
-    </script>
+    }
+
+    function novaRodada() {
+        document.getElementById("resultado").innerText = "";
+        localStorage.removeItem("resultadoRoleta");
+        localStorage.removeItem("sugestoesBrainstorm"); 
+        carregarSugestoes();
+    }
+
+    setInterval(carregarSugestoes, 1000);
+    carregarSugestoes();
+</script>
 </body>
 </html>
