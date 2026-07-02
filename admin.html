@@ -38,8 +38,8 @@
         var ideiaBrain = localStorage.getItem("sugestoesBrainstorm");
         var listaIdeias = JSON.parse(ideiaBrain) || [];
 
-        if (listaIdeias.length == 0) {
-            alert("Erro: Não tem nenhuma opção inserida!");
+        if (listaIdeias.length <= 0) {
+            alert("Erro: Não há sugestões suficientes! Favor esperar os funcionários!");
             return;
         }
 
@@ -48,7 +48,7 @@
 
         textoResultado.innerText = "Girando...";
 
-        grausAtuais = grausAtuais + 1800 + Math.floor(Math.random() * 360);
+        grausAtuais = grausAtuais + 1500 + Math.floor(Math.random() * 360);
         roletaElemento.style.transform = "rotate(" + grausAtuais + "deg)";
 
         var numeroSorteado = Math.floor(Math.random() * listaIdeias.length);
