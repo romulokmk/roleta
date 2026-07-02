@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Gerente - Roda a Roleta!</title>
+    <link rel="stylesheet" href="style.css"></link>
+</head>
+<body>
+
+    <div class="container-admin">
+        
+        <div class="coluna-roleta">
+            <h1>Roleta de Sugestões</h1>
+            
+            <div class="roleta-wrapper">
+                
+                <div class="seta"></div>
+                
+                <div class="roleta" id="roleta">
+                    <div class="centro"></div>
+                </div>
+            
+            </div>
+            
+            <button class="btn-girar" onclick="girarRoleta()">Girar Roleta</button>
+            <div class="resultado" id="resultado"></div>
+        </div>
+
+        <div class="coluna-sugestoes">
+            <h2>Sugestões Recebidas</h2>
+            <ul class="lista-sugestoes" id="listaSugestoes"></ul>
+            <button class="btn-limpar" onclick="limparSugestoes()">Limpar Tudo</button>
+      
+        
+        </div>
+    </div>
+
+    <script>
+    var grausAtuais = 0;
+    
+    // ATENÇÃO: Esta lista agora fica exposta na memória global do navegador
+    window.listaDeSugestoes = [];
+
+    function girarRoleta() {
+        // Lê a lista que foi alimentada pelas abas dos participantes
+        if (window.listaDeSugestoes.length === 0) {
+            alert("Erro: Não tem nenhuma opção inserida!");
+            return;
+        }
+
+        var roletaElemento = document.getElementById("roleta");
+        var textoResultado = document.getElementById("resultado");
+
+        textoResultado.innerText = "Girando...";
+
+        grausAtuais = grausAtuais + 1800 + Math.floor(Math.random() * 360);
+        roletaElemento.style.transform = "rotate(" + grausAtuais + "deg)";
+
+        var numeroSorteado = Math.floor(Math.random() * window.listaDeSugestoes.length);
+        var sugestaoGanhadora = window.listaDeSugestoes[numeroSorteado];
+        var resultadoFinal = "Ganhador: " + sugestaoGanhadora.texto;
+
+        setTimeout(function() {
+            textoResultado.innerText = resultadoFinal;
+            
+            // Avisa todas as abas abertas no navegador sobre quem ganhou
+            var abas = window.open("", "_blank").opener.top;
+            localStorage.setItem("resultadoRoleta", resultadoFinal);
+        }, 4000);
+    }
+
+    // Função simplificada que apenas redesenha a lista na tela
+    function atualizarListaNaTela() {
+        var listaUl = document.getElementById("listaSugestoes");
+        listaUl.innerHTML = "";
+
+        if (window.listaDeSugestoes.length === 0) {
+            listaUl.innerHTML = "<li>Vazio...</li>";
+            return;
+        }
+
+        for (var i = 0; i < window.listaDeSugestoes.length; i++) {
+            var item = window.listaDeSugestoes[i];
+            listaUl.innerHTML += "<li class='item-sugestao'><b>" + item.usuario + ":</b> " + item.texto + "</li>";
+        }
+    }
+
+    function limparSugestoes() {
+        window.listaDeSugestoes = [];
+        localStorage.removeItem("resultadoRoleta");
+        atualizarListaNaTela();
+    }
+
+    function novaRodada() {
+        document.getElementById("resultado").innerText = "";
+        window.listaDeSugestoes = [];
+        localStorage.removeItem("resultadoRoleta");
+        atualizarListaNaTela();
+    }
+
+    // Executa uma vez para começar limpo
+    atualizarListaNaTela();
+    </script>
+</body>
+</html>

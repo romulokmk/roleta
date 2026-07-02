@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roleta de Brainstorm</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tela { display: none; }
+        .tela.ativa { display: block; }
+        .menu-navegacao { margin-bottom: 20px; padding: 10px; background: #ddd; border-radius: 4px; }
+        .menu-navegacao button { padding: 5px 15px; margin-right: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- Menu superior para alternar entre as visões do protótipo -->
+    <div class="menu-navegacao">
+        <span><b>Simulador de Telas:</b></span>
+        <button onclick="mudarTela('tela-participante')">Visão do Participante</button>
+        <button id="btnMenuAdmin" onclick="mudarTela('tela-admin')" style="display: none; background-color: #3498db; color: white;">Visão do Admin</button>
+    </div>
+
+    <!-- ================= TELA DO PARTICIPANTE ================= -->
+    <div id="tela-participante" class="tela ativa">
+        <div class="coluna-roleta" style="width: 450px; margin: 0 auto;">
+            <h1 id="boasVindas">Participante</h1>
+            
+            <input type="text" id="campoLetra" placeholder="Digite sua sugestão..." style="width: 100%; padding: 10px; margin-bottom: 15px;">
+            <button class="btn-girar" id="btnEnviar" onclick="enviarSugestao()" style="width: 100%; background-color: green;">Enviar</button>
+
+            <div id="statusRodada" style="margin-top: 30px; color: gray;">Aguardando sorteio...</div>
+            <div id="caixaResultado" style="margin-top: 20px; font-size: 22px; font-weight: bold;"></div>
+        </div>
+    </div>
+
+    <!-- ================= TELA DO ADMINISTRADOR ================= -->
+    <div id="tela-admin" class="tela">
+        <div class="container-admin">
+            <div class="coluna-roleta">
+                <h1>Painel Admin</h1>
+                <div class="roleta-wrapper">
+                    <div class="seta"></div>
+                    <div class="roleta" id="roleta">
+                        <div class="centro"></div>
+                    </div>
+                </div>
+                <button class="btn-girar" onclick="girarRoleta()">Girar Roleta</button>
+                <button class="btn-limpar" onclick="novaRodada()" style="display: block; margin: 10px auto; background-color: blue;">Nova Rodada</button>
+                <div class="resultado" id="resultado"></div>
+            </div>
+
+            <div class="coluna-sugestoes">
+                <h2>Sugestões</h2>
+                <ul class="lista-sugestoes" id="listaSugestoes"></ul>
+                <button class="btn-limpar" onclick="limparSugestoes()">Limpar Tudo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONTROLE DE SESSÃO E DE TELAS ---
+        var usuarioLogado = sessionStorage.getItem("userLogin") || "Participante";
+        document.getElementById("boasVindas").innerText = usuarioLogado;
+
+        // Se o usuário logado for o admin, exibe o botão secreto de acesso ao painel
+        if (usuarioLogado === "admin") {
+            document.getElementById("btnMenuAdmin").style.display = "inline-block";
+        }
+
+        function mudarTela(idTela) {
+            var telas = document.getElementsByClassName("tela");
+            for (var i = 0; i < telas.length; i++) {
+                telas[i].classList.remove("ativa");
+            }
+            document.getElementById(idTela).classList.add("ativa");
+        }
+
+        // --- LÓGICA DO PARTICIPANTE ---
+        function enviarSugestao() {
+            var campo = document.getElementById("campoLetra");
+            var botao = document.getElementById("btnEnviar");
+            var textoSugestao = campo.value.trim();
+
+            if (textoSugestao === "") {
+                alert("Erro: Digite uma sugestão válida antes de enviar!");
+                return;
+            }
+
+            var dadosBrutos = localStorage.getItem("sugestoesBrainstorm");
+            var listaDados = JSON.parse(dadosBrutos) || [];
+
+            // Valida se o usuário atual já enviou uma sugestão nesta rodada
+            for (var i = 0; i < listaDados.length; i++) {
+                if (listaDados[i].usuario === usuarioLogado) {
+                    alert("Erro: Você já inseriu uma sugestão nesta rodada!");
+                    return;
+                }
+            }
+
+            listaDados.push({
+                usuario: usuarioLogado,
+                texto: textoSugestao
+            });
+
+            localStorage.setItem("sugestoesBrainstorm", JSON.stringify(listaDados));
+            
+            campo.disabled = true;
+            botao.style.backgroundColor = "gray";
+            botao.innerText = "Enviado";
+            
+            // Força a atualização da lista imediatamente
+            carregarSugestoes();
+        }
+
+        // --- LÓGICA DO ADMINISTRADOR ---
+        var grausAtuais = 0;
+
+        function girarRoleta() {
+            var dadosBrutos = localStorage.getItem("sugestoesBrainstorm");
+            var listaDados = JSON.parse(dadosBrutos) || [];
+
+            if (listaDados.length === 0) {
+                alert("Erro: Não tem nenhuma opção inserida!");
+                return;
+            }
+
+            var roletaElemento = document.getElementById("roleta");
+            var textoResultado = document.getElementById("resultado");
+
+            textoResultado.innerText = "Girando...";
+
+            grausAtuais = grausAtuais + 1800 + Math.floor(Math.random() * 360);
+            roletaElemento.style.transform = "rotate(" + grausAtuais + "deg)";
+
+            var numeroSorteado = Math.floor(Math.random() * listaDados.length);
+            var sugestaoGanhadora = listaDados[numeroSorteado];
+            var resultadoFinal = "Ganhador: " + sugestaoGanhadora.texto;
+
+            setTimeout(function() {
+                textoResultado.innerText = resultadoFinal;
+                localStorage.setItem("resultadoRoleta", resultadoFinal);
+            }, 4000);
+        }
+
+        function carregarSugestoes() {
+            var listaUl = document.getElementById("listaSugestoes");
+            var dadosBrutos = localStorage.getItem("sugestoesBrainstorm");
+            var listaDados = JSON.parse(dadosBrutos) || [];
+
+            listaUl.innerHTML = "";
+
+            if (listaDados.length === 0) {
+                listaUl.innerHTML = "<li>Vazio...</li>";
+                return;
+            }
+
+            for (var i = 0; i < listaDados.length; i++) {
+                var item = listaDados[i];
+                listaUl.innerHTML += "<li class='item-sugestao'><b>" + item.usuario + ":</b> " + item.texto + "</li>";
+            }
+        }
+
+        function limparSugestoes() {
+            localStorage.removeItem("sugestoesBrainstorm");
+            carregarSugestoes();
+        }
+
+        function novaRodada() {
+            document.getElementById("resultado").innerText = "";
+            localStorage.removeItem("resultadoRoleta");
+            localStorage.removeItem("sugestoesBrainstorm"); 
+            carregarSugestoes();
+        }
+
+        // --- MONITOR DE SINCRONIZAÇÃO EM TEMPO REAL ---
+        function sincronizarTelas() {
+            var resultadoSorteado = localStorage.getItem("resultadoRoleta");
+            var dadosBrutos = localStorage.getItem("sugestoesBrainstorm");
+            var listaDados = JSON.parse(dadosBrutos) || [];
+            
+            var statusTxt = document.getElementById("statusRodada");
+            var resultadoTxt = document.getElementById("caixaResultado");
+            var campo = document.getElementById("campoLetra");
+            var botao = document.getElementById("btnEnviar");
+
+            // Verifica se o usuário logado tem algo na lista
+            var euJaEnviei = false;
+            for (var i = 0; i < listaDados.length; i++) {
+                if (listaDados[i].usuario === usuarioLogado) {
+                    euJaEnviei = true;
+                }
+            }
+
+            // Atualiza status do sorteio para o participante
+            if (resultadoSorteado) {
+                statusTxt.innerText = "Sorteio Realizado!";
+                resultadoTxt.innerText = resultadoSorteado;
+            } else {
+                statusTxt.innerText = "Aguardando sorteio...";
+                resultadoTxt.innerText = "";
+
+                if (!dadosBrutos || listaDados.length === 0) {
+                    campo.disabled = false;
+                    botao.style.backgroundColor = "green";
+                    botao.innerText = "Enviar";
+                } else if (euJaEnviei === true) {
+                    campo.disabled = true;
+                    botao.style.backgroundColor = "gray";
+                    botao.innerText = "Enviado";
+                }
+            }
+        }
+
+        // Loops de atualização automática
+        setInterval(sincronizarTelas, 1000);
+        setInterval(carregarSugestoes, 1000);
+        
+        // Execuções iniciais
+        carregarSugestoes();
+    </script>
+</body>
+</html>
