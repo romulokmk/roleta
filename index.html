@@ -45,7 +45,7 @@
 
     if(login == "admin" && senha == "1234"){
         // Abre o admin na mesma tela
-        location.href = "roleta.html";
+        location.href = "admin.html";
         return; 
     }
 
@@ -55,8 +55,7 @@
         if (userRegister[login] === senha){
             sessionStorage.setItem("userLogin", login);
             
-            // MÁGICA AQUI: Abre a roleta criando o vínculo de parentesco (window.opener)
-            window.open("roleta.html", "_blank");
+            location.href = "roleta.html";
         } else {
             alert('Usuário ou senha inválidos!');
         }
@@ -66,8 +65,7 @@
 
         sessionStorage.setItem("userLogin", login);
         
-        // MÁGICA AQUI: Abre a roleta criando o vínculo de parentesco (window.opener)
-        window.open("roleta.html", "_blank");
+        location.href = "roleta.html";
     }
 }
     </script>
