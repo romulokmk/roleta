@@ -43,9 +43,13 @@ function logar(){
     var login = document.getElementById('login').value.trim();
     var senha = document.getElementById('senha').value;
 
-    if(login == "admin" && senha == "1234"){
+    if(login == "admin"){
+        if(senha == "1234"){
         location.href = "admin.html";
         return; 
+        }
+    }else{
+        alert('Usuário ou senha inválidos!');
     }
 
     let userRegister = JSON.parse(localStorage.getItem("userRegister")) || {};
