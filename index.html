@@ -51,13 +51,14 @@ function logar(){
     if(login == "admin"){
 
         if(senha == "1234"){
-        location.href = "admin.html";
-        return; 
+            location.href = "admin.html";
+            return; 
+            
+        } else {
+            alert('Senha do admin incorreta!');
+            return;
         }
-    }else{
-        alert('Usuário ou senha inválidos!');
     }
-    return;
 
     let userRegister = JSON.parse(localStorage.getItem("userRegister")) || {};
 
