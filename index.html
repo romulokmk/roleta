@@ -43,6 +43,11 @@ function logar(){
     var login = document.getElementById('login').value.trim();
     var senha = document.getElementById('senha').value;
 
+    if (login === "" || senha === "") {
+    alert("Preencha todos os campos!");
+    return;
+    }
+
     if(login == "admin"){
 
         if(senha == "1234"){
@@ -52,7 +57,8 @@ function logar(){
     }else{
         alert('Usuário ou senha inválidos!');
     }
-
+    return;
+    
     let userRegister = JSON.parse(localStorage.getItem("userRegister")) || {};
     
     if (userRegister[login] != undefined) {
