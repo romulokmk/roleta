@@ -59,6 +59,7 @@ function logar(){
         if (userRegister[login] == senha){
             sessionStorage.setItem("userLogin", login);
             location.href = "roleta.html";
+            return;
         } else {
             alert('Usuário ou senha inválidos!');
             return;
