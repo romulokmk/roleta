@@ -50,6 +50,7 @@ function logar(){
         }
     }else{
         alert('Usuário ou senha inválidos!');
+        return;
     }
 
     let userRegister = JSON.parse(localStorage.getItem("userRegister")) || {};
@@ -60,6 +61,7 @@ function logar(){
             location.href = "roleta.html";
         } else {
             alert('Usuário ou senha inválidos!');
+            return;
         }
     } else {
         userRegister[login] = senha;
