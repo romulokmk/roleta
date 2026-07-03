@@ -44,13 +44,14 @@ function logar(){
     var senha = document.getElementById('senha').value;
 
     if(login == "admin"){
+
         if(senha == "1234"){
         location.href = "admin.html";
-        return; 
+        return;
         }
+
     }else{
         alert('Usuário ou senha inválidos!');
-        return;
     }
 
     let userRegister = JSON.parse(localStorage.getItem("userRegister")) || {};
@@ -62,8 +63,8 @@ function logar(){
             return;
         } else {
             alert('Usuário ou senha inválidos!');
-            return;
         }
+
     } else {
         userRegister[login] = senha;
         localStorage.setItem("userRegister", JSON.stringify(userRegister));
