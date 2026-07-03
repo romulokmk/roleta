@@ -47,7 +47,6 @@ function logar(){
 
         if(senha == "1234"){
         location.href = "admin.html";
-        return;
         }
 
     }else{
@@ -60,7 +59,6 @@ function logar(){
         if (userRegister[login] == senha){
             sessionStorage.setItem("userLogin", login);
             location.href = "roleta.html";
-            return;
         } else {
             alert('Usuário ou senha inválidos!');
         }
