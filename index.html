@@ -49,18 +49,17 @@ function logar(){
     }
 
     if(login == "admin"){
-
+        
         if(senha == "1234"){
         location.href = "admin.html";
+        return; 
         }
-
     }else{
         alert('Usuário ou senha inválidos!');
     }
-    return;
-    
+
     let userRegister = JSON.parse(localStorage.getItem("userRegister")) || {};
-    
+
     if (userRegister[login] != undefined) {
         if (userRegister[login] == senha){
             sessionStorage.setItem("userLogin", login);
@@ -68,7 +67,6 @@ function logar(){
         } else {
             alert('Usuário ou senha inválidos!');
         }
-
     } else {
         userRegister[login] = senha;
         localStorage.setItem("userRegister", JSON.stringify(userRegister));
